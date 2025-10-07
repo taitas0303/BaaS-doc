@@ -21,7 +21,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     checkAuth();
   }, [router]);
 
-  if (loading) return <p>認証確認中...</p>;
+  if (loading) return <p>Loading...</p>;
 
   return <>{children}</>;
 }

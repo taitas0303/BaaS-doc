@@ -37,7 +37,7 @@ export default function LoginPage() {
     }
 
     // ログイン成功
-    router.push('/users');
+    router.push('/home');
   };
 
   return (

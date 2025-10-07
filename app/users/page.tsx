@@ -8,6 +8,7 @@ import LogoutButton from '@/components/LogoutButton';
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isForbidden, setIsForbidden] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -21,6 +22,28 @@ export default function UsersPage() {
         setLoading(false);
         return;
       }
+
+      // 閲覧権限制御(adminのみ)
+      // ログインユーザーの role_id を取得
+      const { data: currentUser, error: userError } = await supabase
+        .from('users')
+        .select('role_id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (userError || !currentUser) {
+        console.error('ユーザー情報取得エラー:', userError?.message);
+        setLoading(false);
+        return;
+      }
+
+      // role_id が 2（admin）以外なら403
+      if (currentUser.role_id < 2) {
+        setIsForbidden(true);
+        setLoading(false);
+        return;
+      }
+
 
       const { data, error } = await supabase
         .from('users')
@@ -44,6 +67,8 @@ export default function UsersPage() {
         <h1>ユーザー一覧</h1>
         {loading ? (
           <p>読み込み中...</p>
+        ) : isForbidden ? (
+          <p style={{ color: 'red'}}>403 Forbidden: このページにアクセスする権限がありません</p>
         ) : users.length > 0 ? (
           <ul>
             {users.map((user) => (
