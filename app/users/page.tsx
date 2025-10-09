@@ -29,7 +29,7 @@ export default function UsersPage() {
         .from('users')
         .select('role_id')
         .eq('user_id', user.id)
-        .single();
+        .single(); //複数件ヒットしたらerror
 
       if (userError || !currentUser) {
         console.error('ユーザー情報取得エラー:', userError?.message);
