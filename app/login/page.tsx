@@ -1,70 +1,83 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+import 'src/app/globals.css';
+
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export default function LoginPage() {
+  const router = useRouter();
+  const [checkingSession, setCheckingSession] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
-  const router = useRouter();
+  const [error, setError] = useState('');
 
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+        window.location.href = '/home';
+      } else {
+        setCheckingSession(false);
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const handleLogin = async () => {
-    if (!validateEmail(email)) {
-      setErrorMsg('有効なメールアドレスを入力してください。');
-      setPassword('');
-      return;
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      window.location.href = '/home';
     }
-
-    if (!email || !password) {
-      setErrorMsg('メールアドレスとパスワードを入力してください。');
-      setPassword('');
-      return;
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error || !data?.session) {
-      console.error('ログインエラー:', error?.message);
-      setErrorMsg('メールアドレスまたはパスワードが正しくありません。');
-      setPassword('');
-      return;
-    }
-
-    // ログイン成功
-    router.push('/home');
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '0 auto', padding: '2rem' }}>
-      <h1>ログイン</h1>
-      <div style={{ marginBottom: '1rem' }}>
+    <main className="p-6 max-w-md mx-auto space-y-6">
+      <h1 className="text-2xl font-bold">ログイン</h1>
+
+      <div>
+        <label className="block mb-1 text-sm font-medium">メールアドレス</label>
         <input
           type="email"
           placeholder="メールアドレス"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem' }}
+          className="w-full p-2 border rounded"
         />
       </div>
-      <div style={{ marginBottom: '1rem' }}>
+
+      <div>
+        <label className="block mb-1 text-sm font-medium">パスワード</label>
         <input
           type="password"
           placeholder="パスワード"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ width: '100%', padding: '0.5rem' }}
+          className="w-full p-2 border rounded"
         />
       </div>
-      <button onClick={handleLogin} style={{ width: '100%', padding: '0.5rem' }}>
+
+      {error && <p className="text-red-500">{error}</p>}
+
+      <button
+        onClick={handleLogin}
+        className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+      >
         ログイン
       </button>
-      {errorMsg && <p style={{ color: 'red', marginTop: '1rem' }}>{errorMsg}</p>}
-    </div>
+    </main>
   );
 }

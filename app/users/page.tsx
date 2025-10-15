@@ -44,7 +44,6 @@ export default function UsersPage() {
         return;
       }
 
-
       const { data, error } = await supabase
         .from('users')
         .select('user_id, first_name, last_name, role:role_id(role_name)');
