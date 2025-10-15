@@ -36,6 +36,7 @@ export default function LoginPage() {
       password,
     });
 
+    //セッション中ならhomeに遷移：Loading入れる？
     if (error) {
       setError(error.message);
     } else {
