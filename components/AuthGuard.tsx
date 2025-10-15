@@ -34,5 +34,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     checkSession();
   }, [router]);
 
+  if (loading) {
+    return <div className="p-6">Loading...</div>;
+  }
+
   return <>{children}</>;
 }
