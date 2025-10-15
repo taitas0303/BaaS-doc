@@ -1,33 +1,33 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient';
 
 export default function LogoutButton() {
+  const router = useRouter();
+
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error('ログアウトエラー:', error.message);
-    } else {
-      window.location.href = '/login';
+    try {
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        console.warn('ログアウト処理をスキップ：セッションが存在しません');
+        router.push('/login');
+        return;
+      }
+
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('ログアウトエラー:', error.message);
+      } else {
+        router.push('/login');
+      }
+    } catch (err) {
+      console.error('予期せぬエラー:', err);
     }
   };
 
   return (
-    <button
-      onClick={handleLogout}
-      style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        padding: '0.5rem 0.75rem',
-        backgroundColor: '#888888',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '4px',
-        fontSize: '0.875rem',
-        height: '40px', // ロゴ画像の高さと合わせる
-        cursor: 'pointer',
-      }}
-    >
+    <button onClick={handleLogout} style={{ /* スタイル省略 */ }}>
       ログアウト
     </button>
   );
