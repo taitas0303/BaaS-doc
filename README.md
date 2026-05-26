@@ -1,6 +1,11 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Getting 
+
+https://ksk-onegate-3740.ids.soliton-ods.jp/certapps/login
+
+
+
 
 First, run the development server:
 
