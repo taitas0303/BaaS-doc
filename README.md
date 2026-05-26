@@ -2,11 +2,6 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting 
 
-https://ksk-onegate-3740.ids.soliton-ods.jp/certapps/login
-
-
-
-
 First, run the development server:
 
 ```bash
